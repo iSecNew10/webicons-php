@@ -14,7 +14,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "\\iSN10\\WebIcons\\": "src"
+      "iSN10\\WebIcons\\": "src/"
     }
   },
   "require": {
