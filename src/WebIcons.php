@@ -27,6 +27,10 @@ class WebIcons
 	{
 		$this->apiKey = $apiKey;
 		$this->apiSecret = $apiSecret;
+
+		if (file_exists($this->getCachePath())) {
+			$this->runtimeCache = json_decode(file_get_contents($this->getCachePath()), true);
+		}
 	}
 
 	public function getIconUrl(
@@ -80,7 +84,8 @@ class WebIcons
 
 	private function setCachedIconUrl(string $cacheKey, string $iconUrl): void
 	{
-		file_put_contents($this->getCachePath($cacheKey), trim($iconUrl));
+		$this->runtimeCache[$cacheKey] = $iconUrl;
+		file_put_contents($this->getCachePath(), json_encode($this->runtimeCache));
 	}
 
 	private function getCachedIconUrl(
@@ -91,16 +96,13 @@ class WebIcons
 	{
 		$cacheKey = $this->getCacheKey($url, $formats, $size);
 		if (!in_array($cacheKey, array_keys($this->runtimeCache))) {
-			if (!file_exists($cachePath = $this->getCachePath($cacheKey))) {
-				return null;
-			}
-			$this->runtimeCache[$cacheKey] = trim(file_get_contents($cachePath));
+			return null;
 		}
 		return $this->runtimeCache[$cacheKey];
 	}
 
-	private function getCachePath(string $cacheKey): string
+	private function getCachePath(): string
 	{
-		return dirname(__DIR__) . '/var/cache/' . $cacheKey . '.cache';
+		return ROOT_PATH . '/var/cache/sys/webicons.cache';
 	}
 }
